@@ -246,16 +246,33 @@
         let stream = null;
 
         // Abrir Câmera (Compatível com HTTPS obrigatório do GitHub)
-        document.getElementById('btnStart').addEventListener('click', async () => {
-            try {
-                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
-                video.srcObject = stream;
-                screenWelcome.classList.add('hidden');
-                screenCamera.classList.remove('hidden');
-            } catch (err) {
-                alert("Para participar, o navegador precisa de permissão de acesso à câmera.");
-            }
-        });
+       document.getElementById('btnStart').addEventListener('click', async () => {
+    try {
+        const constraints = { 
+            video: { 
+                facingMode: "user",
+                width: { ideal: 640 },
+                height: { ideal: 480 }
+            }, 
+            audio: false 
+        };
+        
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
+        video.srcObject = stream;
+        
+        // Correção para iOS/Safari forçar o play
+        video.setAttribute('playsinline', true);
+        video.setAttribute('webkit-playsinline', true);
+        await video.play();
+
+        screenWelcome.classList.add('hidden');
+        screenCamera.classList.remove('hidden');
+    } catch (err) {
+        console.error(err);
+        alert("Erro ao abrir a câmera. Verifique se o site possui o cadeado HTTPS ativo e se você deu permissão de acesso à câmera nas configurações do seu navegador.");
+    }
+});
+
 
         // Capturar e Mesclar Imagens com Distribuição Inteligente anti-sobreposição
 
