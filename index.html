@@ -1,298 +1,846 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Natal no Café e Pastelaria do Carlão</title>
-    <style>
-        :root {
-            --primary-color: #d32f2f;
-            --accent-color: #fbc02d;
-            --bg-color: #f9f9f9;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#b71c1c">
+  <meta name="description" content="Natal no Café e Pastelaria do Carlão — tire sua selfie natalina e participe da promoção.">
+  <title>Natal no Café e Pastelaria do Carlão</title>
 
-        body {
-            margin: 0; padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            display: flex; flex-direction: column; align-items: center;
-            min-height: 100vh;
-        }
+  <style>
+    :root {
+      --primary: #c62828;
+      --primary-dark: #8e0000;
+      --gold: #fbc02d;
+      --green: #176b3a;
+      --bg: #fffaf5;
+      --text: #2b2118;
+      --white: #fff;
+      --shadow: 0 10px 30px rgba(0,0,0,.15);
+    }
 
-        .hidden { display: none !important; }
+    * { box-sizing: border-box; }
 
-        .admin-trigger {
-            position: absolute; top: 15px; right: 15px; font-size: 24px;
-            cursor: pointer; z-index: 100; background: white;
-            border-radius: 50%; padding: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+                   Roboto, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
 
-        .container {
-            width: 100%; max-width: 500px; padding: 20px;
-            box-sizing: border-box; text-align: center;
-        }
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      background:
+        radial-gradient(circle at top, rgba(251,192,45,.18), transparent 35%),
+        var(--bg);
+    }
 
-        h1 { color: var(--primary-color); margin-top: 40px; }
-        
-        .btn {
-            background-color: var(--primary-color); color: white; border: none;
-            padding: 12px 24px; font-size: 16px; border-radius: 25px;
-            cursor: pointer; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: 0.3s; margin-top: 15px;
-        }
-        .btn:hover { background-color: #b71c1c; }
+    button, input, textarea { font: inherit; }
 
-        .camera-box {
-            position: relative; width: 100%; aspect-ratio: 4/3;
-            background: #000; border-radius: 12px; overflow: hidden;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-        }
+    .hidden { display: none !important; }
 
-        video, canvas { width: 100%; height: 100%; object-fit: cover; }
+    .container {
+      width: min(100%, 560px);
+      padding: 20px 16px 40px;
+      text-align: center;
+    }
 
-        .overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; display: flex;
-        }
+    .admin-trigger {
+      position: fixed;
+      top: max(12px, env(safe-area-inset-top));
+      right: 12px;
+      z-index: 100;
+      width: 42px;
+      height: 42px;
+      border: 0;
+      border-radius: 50%;
+      background: rgba(255,255,255,.95);
+      box-shadow: 0 3px 12px rgba(0,0,0,.18);
+      cursor: pointer;
+      font-size: 20px;
+    }
 
-        .overlay-left { width: 50%; height: 100%; }
-        .overlay-right {
-            width: 50%; height: 100%;
-            display: flex; align-items: center; justify-content: center;
-            background: rgba(255, 255, 255, 0.05);
-        }
+    h1 {
+      margin: 42px 0 10px;
+      color: var(--primary);
+      font-size: clamp(30px, 8vw, 44px);
+      line-height: 1.1;
+    }
 
-        .gift-box-img { max-width: 70%; max-height: 70%; object-fit: contain; }
-        .result-box { width: 100%; margin-top: 15px; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); }
+    h2 {
+      color: var(--primary);
+      margin-top: 28px;
+    }
 
-        .modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000;
-        }
+    p {
+      line-height: 1.5;
+    }
 
-        .modal-content {
-            background: white; padding: 25px; border-radius: 12px;
-            width: 90%; max-width: 400px; text-align: left; max-height: 90vh; overflow-y: auto;
-        }
+    .intro {
+      max-width: 470px;
+      margin: 0 auto 20px;
+      font-size: 17px;
+    }
 
-        .modal-content h3 { margin-top: 0; color: var(--primary-color); }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
-        .form-group input, .form-group textarea {
-            width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;
-        }
-        
-        .generated-url {
-            background: #eee; padding: 10px; border-radius: 6px;
-            word-break: break-all; font-size: 12px; margin-top: 10px;
-            user-select: all; border: 1px dashed #777;
-        }
-    </style>
+    .btn {
+      appearance: none;
+      border: 0;
+      border-radius: 999px;
+      padding: 13px 22px;
+      margin: 8px 4px;
+      background: var(--primary);
+      color: var(--white);
+      font-weight: 800;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 5px 12px rgba(0,0,0,.14);
+      transition: transform .15s, background .15s;
+    }
+
+    .btn:hover { background: var(--primary-dark); }
+    .btn:active { transform: scale(.98); }
+    .btn:disabled { opacity: .55; cursor: not-allowed; }
+
+    .btn.secondary {
+      background: #555;
+    }
+
+    .btn.green {
+      background: var(--green);
+    }
+
+    .status {
+      min-height: 24px;
+      margin: 10px 0;
+      font-size: 14px;
+      color: #555;
+    }
+
+    .camera-box {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      overflow: hidden;
+      border-radius: 16px;
+      background: #111;
+      box-shadow: var(--shadow);
+    }
+
+    #video {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+      transform: scaleX(-1);
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      pointer-events: none;
+    }
+
+    .overlay-left {
+      border-right: 1px dashed rgba(255,255,255,.6);
+    }
+
+    .overlay-right {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,.06);
+    }
+
+    .gift-icon {
+      width: 46%;
+      max-width: 150px;
+      aspect-ratio: 1;
+      border-radius: 22px;
+      background: rgba(255,255,255,.88);
+      display: grid;
+      place-items: center;
+      font-size: clamp(55px, 16vw, 100px);
+      box-shadow: 0 6px 20px rgba(0,0,0,.2);
+    }
+
+    .camera-hint {
+      margin: 10px 0;
+      font-weight: 700;
+    }
+
+    .result-wrap {
+      width: 100%;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      background: #111;
+    }
+
+    #canvasResult {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .share-instructions {
+      padding: 0 8px;
+      font-size: 14px;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(0,0,0,.7);
+    }
+
+    .modal-content {
+      width: min(100%, 430px);
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 24px;
+      border-radius: 16px;
+      background: white;
+      text-align: left;
+      box-shadow: var(--shadow);
+    }
+
+    .modal-content h3 {
+      margin-top: 0;
+      color: var(--primary);
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+      border-color: var(--primary);
+    }
+
+    .generated-url {
+      padding: 10px;
+      border: 1px dashed #777;
+      border-radius: 8px;
+      background: #f1f1f1;
+      word-break: break-all;
+      font-size: 12px;
+      user-select: all;
+    }
+
+    .notice {
+      padding: 12px;
+      border-radius: 10px;
+      background: #fff3cd;
+      color: #664d03;
+      font-size: 13px;
+      text-align: left;
+    }
+
+    .footer {
+      margin-top: 24px;
+      font-size: 12px;
+      color: #777;
+    }
+  </style>
 </head>
+
 <body>
+  <button class="admin-trigger" id="adminTrigger" aria-label="Configurações">⚙️</button>
 
-    <div class="admin-trigger" id="adminTrigger">⚙️</div>
+  <main class="container">
+    <!-- Tela inicial -->
+    <section id="screenWelcome">
+      <h1>Natal no Carlão! 🎄</h1>
+      <p class="intro">
+        Venha celebrar conosco! Tire uma linda selfie natalina de presente
+        e participe da nossa promoção.
+      </p>
 
-    <div class="container">
-        <!-- Tela 1 -->
-        <div id="screenWelcome">
-            <h1>Natal no Carlão! 🎄</h1>
-            <p>Venha celebrar conosco! Tire uma linda selfie natalina de presente e participe da nossa promoção.</p>
-            <button class="btn" id="btnStart">📸 Participar da Promoção</button>
+      <button class="btn" id="btnStart">📸 Participar da Promoção</button>
+
+      <p class="status" id="welcomeStatus" aria-live="polite"></p>
+    </section>
+
+    <!-- Câmera -->
+    <section id="screenCamera" class="hidden">
+      <h2>Fique do lado esquerdo! 😉</h2>
+      <p class="camera-hint">Posicione-se à esquerda e deixe espaço para o presente.</p>
+
+      <div class="camera-box">
+        <video id="video" autoplay playsinline muted></video>
+
+        <div class="overlay" aria-hidden="true">
+          <div class="overlay-left"></div>
+          <div class="overlay-right">
+            <div class="gift-icon">🎁</div>
+          </div>
         </div>
+      </div>
 
-        <!-- Tela 2 -->
-        <div id="screenCamera" class="hidden">
-            <h2>Fique do lado esquerdo! 😉</h2>
-            <div class="camera-box">
-                <video id="video" autoplay playsinline muted></video>
-                <div class="overlay">
-                    <div class="overlay-left"></div>
-                    <div class="overlay-right">
-                        <img src="https://flaticon.com" class="gift-box-img" id="giftIcon" alt="Presente Natal">
-                    </div>
-                </div>
-            </div>
-            <button class="btn" id="btnCapture">Tirar Foto</button>
-        </div>
+      <p class="status" id="cameraStatus" aria-live="polite"></p>
 
-        <!-- Tela 3 -->
-        <div id="screenResult" class="hidden">
-            <h2>Sua foto ficou linda! 🎉</h2>
-            <canvas id="canvasResult" class="result-box"></canvas>
-            <p id="shareInstructions" style="font-size: 14px; color: #333; line-height: 1.4;"></p>
-            <button class="btn" id="btnShare">Compartilhar no Instagram</button>
-            <button class="btn" id="btnReset" style="background:#555;">Tirar Outra</button>
-        </div>
+      <button class="btn" id="btnCapture">📷 Tirar Foto</button>
+      <button class="btn secondary" id="btnCameraBack">Voltar</button>
+    </section>
+
+    <!-- Resultado -->
+    <section id="screenResult" class="hidden">
+      <h2>Sua foto ficou linda! 🎉</h2>
+
+      <div class="result-wrap">
+        <canvas id="canvasResult" width="1200" height="900"></canvas>
+      </div>
+
+      <p class="share-instructions" id="shareInstructions"></p>
+
+      <button class="btn green" id="btnShare">📲 Compartilhar</button>
+      <button class="btn" id="btnSave">⬇️ Salvar Foto</button>
+      <button class="btn secondary" id="btnReset">📸 Tirar Outra</button>
+    </section>
+
+    <p class="footer">Boas festas! 🎅🎄</p>
+  </main>
+
+  <!-- Login administrativo -->
+  <div id="modalLogin" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+    <div class="modal-content">
+      <h3 id="loginTitle">Acesso Administrativo</h3>
+
+      <div class="form-group">
+        <label for="adminUser">Usuário</label>
+        <input type="text" id="adminUser" autocomplete="username">
+      </div>
+
+      <div class="form-group">
+        <label for="adminPass">Senha</label>
+        <input type="password" id="adminPass" autocomplete="current-password">
+      </div>
+
+      <button class="btn" id="btnLoginSubmit">Entrar</button>
+      <button class="btn secondary" id="btnLoginClose">Cancelar</button>
+
+      <p class="notice">
+        Observação: este painel é apenas uma configuração local da página.
+        Para segurança real, a autenticação deve ser feita no servidor.
+      </p>
     </div>
+  </div>
 
-    <!-- Modal 1 -->
-    <div id="modalLogin" class="modal hidden">
-        <div class="modal-content">
-            <h3>Acesso Administrativo</h3>
-            <div class="form-group">
-                <label>Usuário:</label> <input type="text" id="adminUser">
-            </div>
-            <div class="form-group">
-                <label>Senha:</label> <input type="password" id="adminPass">
-            </div>
-            <button class="btn" id="btnLoginSubmit">Entrar</button>
-            <button class="btn" id="btnLoginClose" style="background:#555;">Cancelar</button>
-        </div>
+  <!-- Configuração -->
+  <div id="modalConfig" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="configTitle">
+    <div class="modal-content">
+      <h3 id="configTitle">Configuração do QR Code</h3>
+
+      <div class="form-group">
+        <label for="configMsg">Mensagem de Natal</label>
+        <textarea id="configMsg" rows="3"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="configHash">Hashtag (#)</label>
+        <input type="text" id="configHash">
+      </div>
+
+      <div class="form-group">
+        <label for="configAt">Instagram do Café (@)</label>
+        <input type="text" id="configAt">
+      </div>
+
+      <button class="btn" id="btnGenerateLink">🔗 Gerar Link do QR Code</button>
+      <button class="btn secondary" id="btnConfigClose">Fechar</button>
+
+      <div id="urlOutputContainer" class="hidden">
+        <h4 style="margin-bottom:5px;color:green;">Link criado com sucesso!</h4>
+        <div class="generated-url" id="generatedUrlText"></div>
+      </div>
     </div>
+  </div>
 
-    <!-- Modal 2 -->
-    <div id="modalConfig" class="modal hidden">
-        <div class="modal-content">
-            <h3>Configuração do QR Code</h3>
-            <div class="form-group">
-                <label>Mensagem de Natal:</label> <textarea id="configMsg" rows="2"></textarea>
-            </div>
-            <div class="form-group">
-                <label>Hashtag (#):</label> <input type="text" id="configHash">
-            </div>
-            <div class="form-group">
-                <label>Instagram do Café (@):</label> <input type="text" id="configAt">
-            </div>
-            <div class="form-group">
-                <label>URL da Foto da Proprietária:</label> <input type="text" id="configPhotoUrl" placeholder="https://site.com">
-            </div>
-            <button class="btn" id="btnGenerateLink">Gerar Link do QR Code</button>
-            <button class="btn" id="btnConfigClose" style="background:#555;">Fechar</button>
+  <script>
+    "use strict";
 
-            <div id="urlOutputContainer" class="hidden">
-                <h4 style="margin-bottom:5px; margin-top:15px; color:green;">Link Criado com Sucesso!</h4>
-                <div class="generated-url" id="generatedUrlText"></div>
-            </div>
-        </div>
-    </div>
+    /*
+     * CONFIGURAÇÃO LOCAL
+     * IMPORTANTE: credenciais no JavaScript não são segurança real.
+     * Para uma promoção pública, remova o login ou implemente autenticação
+     * em um servidor.
+     */
+    const CRED_USER = "carlao";
+    const CRED_PASS = "natal2026";
 
-    <script>
-        const CRED_USER = "carlao";
-        const CRED_PASS = "natal2026"; 
+    const DEFAULTS = {
+      msg: "Feliz Natal da nossa família para a sua!",
+      hash: "#NatalNoCarlao",
+      at: "@cafepastelariacarleo"
+    };
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const natalMsg = urlParams.get('msg') || "Feliz Natal da nossa família para a sua!";
-        const natalHash = urlParams.get('hash') || "#NatalNoCarlao";
-        const natalAt = urlParams.get('at') || "@cafepastelariacarleo";
-        const natalPhoto = urlParams.get('photo') || "https://unsplash.com";
+    const params = new URLSearchParams(window.location.search);
 
-        const screenWelcome = document.getElementById('screenWelcome');
-        const screenCamera = document.getElementById('screenCamera');
-        const screenResult = document.getElementById('screenResult');
-        const video = document.getElementById('video');
-        const canvasResult = document.getElementById('canvasResult');
-        let stream = null;
+    const config = {
+      msg: params.get("msg") || DEFAULTS.msg,
+      hash: params.get("hash") || DEFAULTS.hash,
+      at: params.get("at") || DEFAULTS.at
+    };
 
-        // MOTOR DE ATIVAÇÃO ULTRA-COMPATÍVEL CONTRAPARTIDA SAMSUNG/ANDROID
-        document.getElementById('btnStart').addEventListener('click', async () => {
-            // Lista de tentativas ordenadas das mais complexas até as mais simples e diretas
-            const mídiasTentativas = [
-                { video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } }, audio: false },
-                { video: { facingMode: "user" }, audio: false },
-                { video: true, audio: false }
-            ];
+    const $ = (id) => document.getElementById(id);
 
-            let sucesso = false;
-            let erroCapturado = null;
+    const screenWelcome = $("screenWelcome");
+    const screenCamera = $("screenCamera");
+    const screenResult = $("screenResult");
 
-            for (let tentativa of mídiasTentativas) {
-                try {
-                    if (stream) { stream.getTracks().forEach(track => track.stop()); }
-                    
-                    stream = await navigator.mediaDevices.getUserMedia(tentativa);
-                    video.srcObject = stream;
-                    
-                    // Inicialização forçada para motores WebKit/Blink móveis
-                    await new Promise((resolve) => {
-                        video.onloadedmetadata = () => { resolve(); };
-                    });
-                    
-                    await video.play();
-                    sucesso = true;
-                    break; // Se funcionou, sai do loop imediatamente
-                } catch (e) {
-                    erroCapturado = e;
-                    console.warn("Tentativa de câmera falhou, tentando alternativa...", e);
-                }
-            }
+    const video = $("video");
+    const canvas = $("canvasResult");
+    const ctx = canvas.getContext("2d", { alpha: false });
 
-            if (sucesso) {
-                screenWelcome.classList.add('hidden');
-                screenCamera.classList.remove('hidden');
+    const btnStart = $("btnStart");
+    const btnCapture = $("btnCapture");
+    const btnReset = $("btnReset");
+    const btnSave = $("btnSave");
+    const btnShare = $("btnShare");
+    const btnCameraBack = $("btnCameraBack");
+
+    const welcomeStatus = $("welcomeStatus");
+    const cameraStatus = $("cameraStatus");
+    const shareInstructions = $("shareInstructions");
+
+    const modalLogin = $("modalLogin");
+    const modalConfig = $("modalConfig");
+
+    let stream = null;
+    let lastPhotoBlob = null;
+
+    function showScreen(screen) {
+      [screenWelcome, screenCamera, screenResult].forEach(s => s.classList.add("hidden"));
+      screen.classList.remove("hidden");
+    }
+
+    function setStatus(element, message) {
+      element.textContent = message || "";
+    }
+
+    function normalizeInstagram(value) {
+      let v = String(value || "").trim();
+      if (!v) return "";
+      return v.startsWith("@") ? v : "@" + v;
+    }
+
+    function normalizeHash(value) {
+      let v = String(value || "").trim();
+      if (!v) return "";
+      return v.startsWith("#") ? v : "#" + v;
+    }
+
+    function stopCamera() {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+      }
+      video.srcObject = null;
+    }
+
+    async function startCamera() {
+      setStatus(welcomeStatus, "");
+      setStatus(cameraStatus, "Solicitando acesso à câmera…");
+
+      if (!window.isSecureContext) {
+        throw new Error(
+          "A câmera exige HTTPS. Publique esta página em HTTPS ou use localhost durante os testes."
+        );
+      }
+
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error("Este navegador não oferece suporte à câmera.");
+      }
+
+      const attempts = [
+        {
+          video: {
+            facingMode: { ideal: "user" },
+            width: { ideal: 1200 },
+            height: { ideal: 900 }
+          },
+          audio: false
+        },
+        {
+          video: { facingMode: "user" },
+          audio: false
+        },
+        {
+          video: true,
+          audio: false
+        }
+      ];
+
+      let lastError = null;
+
+      for (const constraints of attempts) {
+        try {
+          stopCamera();
+          stream = await navigator.mediaDevices.getUserMedia(constraints);
+          video.srcObject = stream;
+
+          await new Promise(resolve => {
+            if (video.readyState >= 1) {
+              resolve();
             } else {
-                console.error("Todas as tentativas de ativação falharam:", erroCapturado);
-                alert("A câmera não abriu. Isso acontece no Android por dois motivos:\n\n1. O aplicativo do Chrome está sem permissão no seu celular. Vá em Configurações do Android > Aplicativos > Chrome > Permissões > Câmera e mude para 'Permitir'.\n\n2. Abas anônimas às vezes bloqueiam recursos de hardware por privacidade.");
+              video.onloadedmetadata = resolve;
             }
-        });
+          });
 
-        document.getElementById('btnCapture').addEventListener('click', () => {
+          await video.play();
 
-const ctx = canvasResult.getContext('2d');
-canvasResult.width = 800;
-canvasResult.height = 600;
-ctx.save();
-ctx.translate(400, 0);
-ctx.scale(-1, 1);
-ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight, -400, 0, 400, 600);
-ctx.restore();
-const imgOwner = new Image();
-imgOwner.crossOrigin = "anonymous";
-imgOwner.src = natalPhoto;
-imgOwner.onload = function() {
-ctx.drawImage(imgOwner, 400, 0, 400, 600);
-ctx.fillStyle = "rgba(0, 0, 0, 0.65)";
-ctx.fillRect(40, 25, 720, 85);
-ctx.fillStyle = "#ffffff";
-ctx.font = "bold 22px sans-serif";
-ctx.textAlign = "center";
-ctx.textBaseline = "middle";
-ctx.fillText(natalMsg, 400, 67);
-ctx.fillStyle = "rgba(211, 47, 47, 0.95)";
-ctx.fillRect(0, 535, 800, 65);
-ctx.fillStyle = "#ffffff";
-ctx.font = "bold 20px sans-serif";
-ctx.fillText(${natalAt}   ${natalHash}, 400, 568);
-screenCamera.classList.add('hidden');
-screenResult.classList.remove('hidden');
-if(stream) stream.getTracks().forEach(track => track.stop());
-document.getElementById('shareInstructions').innerHTML = <b>Passo 1:</b> Toque e segure na imagem acima para salvá-la.<br> <b>Passo 2:</b> Poste no seu story ou feed do Instagram marcando o dono da festa: <b>${natalAt}</b> e usando a hashtag <b>${natalHash}</b>!;
-};
-});
-document.getElementById('btnReset').addEventListener('click', () => {
-screenResult.classList.add('hidden');
-document.getElementById('btnStart').click();
-});
-document.getElementById('btnShare').addEventListener('click', () => {
-window.location.href = "instagram://camera";
-setTimeout(() => { window.location.href = "https://instagram.com"; }, 1200);
-});
-const modalLogin = document.getElementById('modalLogin');
-const modalConfig = document.getElementById('modalConfig');
-document.getElementById('adminTrigger').addEventListener('click', () => modalLogin.classList.remove('hidden'));
-document.getElementById('btnLoginClose').addEventListener('click', () => modalLogin.classList.add('hidden'));
-document.getElementById('btnConfigClose').addEventListener('click', () => modalConfig.classList.add('hidden'));
-document.getElementById('btnLoginSubmit').addEventListener('click', () => {
-const user = document.getElementById('adminUser').value;
-const pass = document.getElementById('adminPass').value;
-if (user === CRED_USER && pass === CRED_PASS) {
-modalLogin.classList.add('hidden');
-modalConfig.classList.remove('hidden');
-document.getElementById('configMsg').value = natalMsg;
-document.getElementById('configHash').value = natalHash;
-document.getElementById('configAt').value = natalAt;
-document.getElementById('configPhotoUrl').value = natalPhoto;
-} else {
-alert("Credenciais incorretas. Acesso negado.");
-}
-});
-document.getElementById('btnGenerateLink').addEventListener('click', () => {
-const m = encodeURIComponent(document.getElementById('configMsg').value);
-const h = encodeURIComponent(document.getElementById('configHash').value);
-const a = encodeURIComponent(document.getElementById('configAt').value);
-const p = encodeURIComponent(document.getElementById('configPhotoUrl').value);
-const baseUrl = window.location.href.split('?');
-const finalUrl = ${baseUrl}?msg=${m}&hash=${h}&at=${a}&photo=${p};
-document.getElementById('generatedUrlText').innerText = finalUrl;
-document.getElementById('urlOutputContainer').classList.remove('hidden');
-});
+          setStatus(cameraStatus, "");
+          return;
+        } catch (error) {
+          lastError = error;
+        }
+      }
+
+      throw lastError || new Error("Não foi possível abrir a câmera.");
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+      const radius = Math.min(r, w / 2, h / 2);
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.arcTo(x + w, y, x + w, y + h, radius);
+      ctx.arcTo(x + w, y + h, x, y + h, radius);
+      ctx.arcTo(x, y + h, x, y, radius);
+      ctx.arcTo(x, y, x + w, y, radius);
+      ctx.closePath();
+    }
+
+    function drawWrappedText(text, x, y, maxWidth, lineHeight, maxLines = 3) {
+      const words = String(text).split(/\s+/);
+      const lines = [];
+      let current = "";
+
+      for (const word of words) {
+        const candidate = current ? current + " " + word : word;
+
+        if (ctx.measureText(candidate).width <= maxWidth) {
+          current = candidate;
+        } else {
+          if (current) lines.push(current);
+          current = word;
+        }
+
+        if (lines.length === maxLines) break;
+      }
+
+      if (current && lines.length < maxLines) lines.push(current);
+
+      lines.forEach((line, i) => {
+        ctx.fillText(line, x, y + i * lineHeight);
+      });
+
+      return lines.length;
+    }
+
+    function drawGift(ctx, cx, cy, size) {
+      const s = size;
+      const x = cx - s / 2;
+      const y = cy - s / 2;
+
+      ctx.save();
+
+      ctx.fillStyle = "#d32f2f";
+      roundRect(ctx, x, y + s * .22, s, s * .62, s * .07);
+      ctx.fill();
+
+      ctx.fillStyle = "#fbc02d";
+      ctx.fillRect(cx - s * .07, y + s * .22, s * .14, s * .62);
+      ctx.fillRect(x, y + s * .42, s, s * .14);
+
+      ctx.beginPath();
+      ctx.ellipse(cx - s * .12, y + s * .16, s * .16, s * .10, -0.5, 0, Math.PI * 2);
+      ctx.ellipse(cx + s * .12, y + s * .16, s * .16, s * .10, 0.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function drawPhoto() {
+      const W = 1200;
+      const H = 900;
+      canvas.width = W;
+      canvas.height = H;
+
+      ctx.fillStyle = "#111";
+      ctx.fillRect(0, 0, W, H);
+
+      /*
+       * O vídeo é espelhado para a pessoa se enxergar como num espelho.
+       * Aqui reproduzimos exatamente essa aparência no resultado.
+       */
+      const vw = video.videoWidth || 640;
+      const vh = video.videoHeight || 480;
+
+      const halfW = W / 2;
+      const targetRatio = halfW / H;
+      const sourceRatio = vw / vh;
+
+      let sx, sy, sw, sh;
+
+      if (sourceRatio > targetRatio) {
+        sh = vh;
+        sw = Math.round(vh * targetRatio);
+        sx = Math.round((vw - sw) / 2);
+        sy = 0;
+      } else {
+        sw = vw;
+        sh = Math.round(vw / targetRatio);
+        sx = 0;
+        sy = Math.round((vh - sh) / 2);
+      }
+
+      ctx.save();
+      ctx.translate(halfW, 0);
+      ctx.scale(-1, 1);
+      ctx.drawImage(video, sx, sy, sw, sh, 0, 0, halfW, H);
+      ctx.restore();
+
+      // Área do presente.
+      ctx.fillStyle = "#fff9";
+      ctx.fillRect(halfW, 0, halfW, H);
+
+      // Decoração natalina sem depender de imagens externas.
+      drawGift(ctx, halfW + halfW / 2, H * .46, Math.min(270, halfW * .60));
+
+      ctx.fillStyle = "#176b3a";
+      ctx.font = "800 34px system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("Feliz Natal! 🎄", halfW + halfW / 2, H * .68);
+
+      // Mensagem superior.
+      ctx.fillStyle = "rgba(0,0,0,.68)";
+      roundRect(ctx, 55, 38, W - 110, 130, 24);
+      ctx.fill();
+
+      ctx.fillStyle = "#fff";
+      ctx.font = "800 36px system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "top";
+      drawWrappedText(config.msg, W / 2, 68, W - 170, 45, 2);
+
+      // Rodapé.
+      ctx.fillStyle = "#c62828";
+      ctx.fillRect(0, H - 95, W, 95);
+
+      ctx.fillStyle = "#fff";
+      ctx.font = "800 28px system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      const instagram = normalizeInstagram(config.at);
+      const hashtag = normalizeHash(config.hash);
+      ctx.fillText(`${instagram}   ${hashtag}`, W / 2, H - 47);
+
+      canvas.toBlob(blob => {
+        lastPhotoBlob = blob;
+      }, "image/jpeg", 0.92);
+    }
+
+    async function canvasToBlob() {
+      return new Promise(resolve => {
+        canvas.toBlob(resolve, "image/jpeg", 0.92);
+      });
+    }
+
+    btnStart.addEventListener("click", async () => {
+      btnStart.disabled = true;
+
+      try {
+        await startCamera();
+        showScreen(screenCamera);
+      } catch (error) {
+        console.error(error);
+        setStatus(
+          welcomeStatus,
+          error.message ||
+          "Não foi possível abrir a câmera. Verifique a permissão do navegador."
+        );
+      } finally {
+        btnStart.disabled = false;
+      }
+    });
+
+    btnCapture.addEventListener("click", async () => {
+      if (!video.videoWidth || !video.videoHeight) {
+        setStatus(cameraStatus, "A câmera ainda não está pronta. Aguarde um instante.");
+        return;
+      }
+
+      btnCapture.disabled = true;
+      setStatus(cameraStatus, "Preparando sua foto…");
+
+      try {
+        drawPhoto();
+        lastPhotoBlob = await canvasToBlob();
+
+        stopCamera();
+        showScreen(screenResult);
+
+        const instagram = normalizeInstagram(config.at);
+        const hashtag = normalizeHash(config.hash);
+
+        shareInstructions.innerHTML =
+          `Publique sua foto no Story ou no Feed e marque ` +
+          `<strong>${escapeHtml(instagram)}</strong> ` +
+          `usando <strong>${escapeHtml(hashtag)}</strong>.`;
+      } finally {
+        btnCapture.disabled = false;
+      }
+    });
+
+    btnCameraBack.addEventListener("click", () => {
+      stopCamera();
+      showScreen(screenWelcome);
+    });
+
+    btnReset.addEventListener("click", async () => {
+      showScreen(screenWelcome);
+      btnStart.click();
+    });
+
+    btnSave.addEventListener("click", async () => {
+      const blob = lastPhotoBlob || await canvasToBlob();
+      if (!blob) return;
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "natal-no-carlao.jpg";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    });
+
+    btnShare.addEventListener("click", async () => {
+      const blob = lastPhotoBlob || await canvasToBlob();
+      if (!blob) return;
+
+      const file = new File([blob], "natal-no-carlao.jpg", { type: "image/jpeg" });
+
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            title: "Natal no Carlão 🎄",
+            text: `${normalizeInstagram(config.at)} ${normalizeHash(config.hash)}`,
+            files: [file]
+          });
+          return;
+        } catch (error) {
+          if (error && error.name === "AbortError") return;
+        }
+      }
+
+      // Fallback: salva a foto e abre o Instagram.
+      btnSave.click();
+
+      setTimeout(() => {
+        window.location.href = "https://www.instagram.com/";
+      }, 500);
+    });
+
+    $("adminTrigger").addEventListener("click", () => {
+      modalLogin.classList.remove("hidden");
+      $("adminUser").focus();
+    });
+
+    $("btnLoginClose").addEventListener("click", () => {
+      modalLogin.classList.add("hidden");
+    });
+
+    $("btnConfigClose").addEventListener("click", () => {
+      modalConfig.classList.add("hidden");
+    });
+
+    $("btnLoginSubmit").addEventListener("click", () => {
+      const user = $("adminUser").value.trim();
+      const pass = $("adminPass").value;
+
+      if (user === CRED_USER && pass === CRED_PASS) {
+        modalLogin.classList.add("hidden");
+        modalConfig.classList.remove("hidden");
+
+        $("configMsg").value = config.msg;
+        $("configHash").value = config.hash;
+        $("configAt").value = config.at;
+      } else {
+        alert("Credenciais incorretas. Acesso negado.");
+      }
+    });
+
+    $("btnGenerateLink").addEventListener("click", () => {
+      const msg = $("configMsg").value.trim() || DEFAULTS.msg;
+      const hash = normalizeHash($("configHash").value) || DEFAULTS.hash;
+      const at = normalizeInstagram($("configAt").value) || DEFAULTS.at;
+
+      const url = new URL(window.location.href);
+      url.search = "";
+      url.searchParams.set("msg", msg);
+      url.searchParams.set("hash", hash);
+      url.searchParams.set("at", at);
+
+      $("generatedUrlText").textContent = url.toString();
+      $("urlOutputContainer").classList.remove("hidden");
+    });
+
+    // Fecha modais clicando fora.
+    [modalLogin, modalConfig].forEach(modal => {
+      modal.addEventListener("click", event => {
+        if (event.target === modal) modal.classList.add("hidden");
+      });
+    });
+
+    // ESC fecha os modais.
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") {
+        modalLogin.classList.add("hidden");
+        modalConfig.classList.add("hidden");
+      }
+    });
+
+    function escapeHtml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    window.addEventListener("pagehide", stopCamera);
+  </script>
+</body>
+</html>
