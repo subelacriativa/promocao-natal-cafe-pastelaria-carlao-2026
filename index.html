@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Natal no Café e Pastelaria do Carlão</title>
+    <style>
+        :root {
+            --primary-color: #d32f2f;
+            --accent-color: #fbc02d;
+            --bg-color: #f9f9f9;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .hidden { display: none !important; }
+
+        /* Ícone de Configuração (Engrenagem) */
+        .admin-trigger {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 100;
+            background: white;
+            border-radius: 50%;
+            padding: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        h1 { color: var(--primary-color); margin-top: 40px; }
+        
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: 0.3s;
+            margin-top: 15px;
+        }
+        .btn:hover { background-color: #b71c1c; }
+
+        /* Câmera */
+        .camera-box {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4/3;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+
+        video, canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            display: flex;
+        }
+
+        .overlay-left { width: 50%; height: 100%; }
+        .overlay-right {
+            width: 50%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .gift-box-img {
+            max-width: 70%;
+            max-height: 70%;
+            object-fit: contain;
+        }
+
+        .result-box {
+            width: 100%;
+            margin-top: 15px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+
+        /* Modais */
+        .modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white; padding: 25px; border-radius: 12px;
+            width: 90%; max-width: 400px; text-align: left;
+            max-height: 90vh; overflow-y: auto;
+        }
+
+        .modal-content h3 { margin-top: 0; color: var(--primary-color); }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .form-group input, .form-group textarea {
+            width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;
+        }
+        
+        .generated-url {
+            background: #eee; padding: 10px; border-radius: 6px;
+            word-break: break-all; font-size: 12px; margin-top: 10px;
+            user-select: all; border: 1px dashed #777;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Botão de Configuração Oculto/Discreto -->
+    <div class="admin-trigger" id="adminTrigger">⚙️</div>
+
+    <div class="container">
+        <!-- Tela 1: Boas-Vindas -->
+        <div id="screenWelcome">
+            <h1>Natal no Carlão! 🎄</h1>
+            <p>Venha celebrar conosco! Tire uma linda selfie natalina de presente e participe da nossa promoção.</p>
+            <button class="btn" id="btnStart">📸 Participar da Promoção</button>
+        </div>
+
+        <!-- Tela 2: Câmera Ativa -->
+        <div id="screenCamera" class="hidden">
+            <h2>Fique do lado esquerdo! 😉</h2>
+            <div class="camera-box">
+                <video id="video" autoplay playsinline></video>
+                <div class="overlay">
+                    <div class="overlay-left"></div>
+                    <div class="overlay-right">
+                        <!-- Ícone da Caixa de Presente enquanto enquadra -->
+                        <img src="https://flaticon.com" class="gift-box-img" id="giftIcon" alt="Presente Natal">
+                    </div>
+                </div>
+            </div>
+            <button class="btn" id="btnCapture">Tirar Foto</button>
+        </div>
+
+        <!-- Tela 3: Resultado Montado -->
+        <div id="screenResult" class="hidden">
+            <h2>Sua foto ficou linda! 🎉</h2>
+            <canvas id="canvasResult" class="result-box"></canvas>
+            <p id="shareInstructions" style="font-size: 14px; color: #333; line-height: 1.4;"></p>
+            <button class="btn" id="btnShare">Compartilhar no Instagram</button>
+            <button class="btn" id="btnReset" style="background:#555;">Tirar Outra</button>
+        </div>
+    </div>
+
+    <!-- Modal 1: Login Administrativo -->
+    <div id="modalLogin" class="modal hidden">
+        <div class="modal-content">
+            <h3>Acesso Administrativo</h3>
+            <div class="form-group">
+                <label>Usuário:</label>
+                <input type="text" id="adminUser">
+            </div>
+            <div class="form-group">
+                <label>Senha:</label>
+                <input type="password" id="adminPass">
+            </div>
+            <button class="btn" id="btnLoginSubmit">Entrar</button>
+            <button class="btn" id="btnLoginClose" style="background:#555;">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- Modal 2: Painel de Controle Gerador de Link -->
+    <div id="modalConfig" class="modal hidden">
+        <div class="modal-content">
+            <h3>Configuração do QR Code</h3>
+            <p style="font-size:12px; color:#666;">Preencha os dados abaixo para gerar o link final que será colocado no seu QR Code.</p>
+            <div class="form-group">
+                <label>Mensagem de Natal:</label>
+                <textarea id="configMsg" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Hashtag (#):</label>
+                <input type="text" id="configHash">
+            </div>
+            <div class="form-group">
+                <label>Instagram do Café (@):</label>
+                <input type="text" id="configAt">
+            </div>
+            <div class="form-group">
+                <label>URL da Foto da Proprietária:</label>
+                <input type="text" id="configPhotoUrl" placeholder="https://site.com">
+                <small style="color:#777; font-size:11px;">Dica: Suba a foto no próprio repositório do GitHub e cole o link aqui.</small>
+            </div>
+            <button class="btn" id="btnGenerateLink">Gerar Link do QR Code</button>
+            <button class="btn" id="btnConfigClose" style="background:#555;">Fechar</button>
+
+            <div id="urlOutputContainer" class="hidden">
+                <h4 style="margin-bottom:5px; margin-top:15px; color:green;">Link Criado com Sucesso!</h4>
+                <p style="font-size:11px; margin:0;">Copie o link abaixo e use-o para gerar o seu QR Code:</p>
+                <div class="generated-url" id="generatedUrlText"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- CREDENCIAIS DE SEGURANÇA INTERNAS ---
+        const CRED_USER = "carlao";
+        const CRED_PASS = "natal2026"; 
+
+        // Captura parâmetros passados no Link do QR Code (Fallback caso não existam)
+        const urlParams = new URLSearchParams(window.location.search);
+        const natalMsg = urlParams.get('msg') || "Feliz Natal da nossa família para a sua!";
+        const natalHash = urlParams.get('hash') || "#NatalNoCarlao";
+        const natalAt = urlParams.get('at') || "@cafepastelariacarleo";
+        const natalPhoto = urlParams.get('photo') || "https://unsplash.com"; // Foto padrão genérica
+
+        // Elementos de Fluxo
+        const screenWelcome = document.getElementById('screenWelcome');
+        const screenCamera = document.getElementById('screenCamera');
+        const screenResult = document.getElementById('screenResult');
+        const video = document.getElementById('video');
+        const canvasResult = document.getElementById('canvasResult');
+        let stream = null;
+
+        // Abrir Câmera (Compatível com HTTPS obrigatório do GitHub)
+        document.getElementById('btnStart').addEventListener('click', async () => {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
+                video.srcObject = stream;
+                screenWelcome.classList.add('hidden');
+                screenCamera.classList.remove('hidden');
+            } catch (err) {
+                alert("Para participar, o navegador precisa de permissão de acesso à câmera.");
+            }
+        });
+
+        // Capturar e Mesclar Imagens com Distribuição Inteligente anti-sobreposição
+
+
+document.getElementById('btnCapture').addEventListener('click', () => {
+const ctx = canvasResult.getContext('2d');
+// Proporções ideais de imagem final estável para postar
+canvasResult.width = 800;
+canvasResult.height = 600;
+// 1. Renderiza a Selfie do Cliente espelhada no lado esquerdo (0 a 400px)
+ctx.save();
+ctx.translate(400, 0);
+ctx.scale(-1, 1);
+ctx.drawImage(video, 0, 0, video.videoWidth, video.videoHeight, -400, 0, 400, 600);
+ctx.restore();
+// 2. Renderiza a imagem da Proprietária no lado direito (400px a 800px)
+const imgOwner = new Image();
+imgOwner.crossOrigin = "anonymous";
+imgOwner.src = natalPhoto;
+imgOwner.onload = function() {
+ctx.drawImage(imgOwner, 400, 0, 400, 600);
+// 3. Tarja Superior Protegida para a Frase da Proprietária (Não toca no rosto)
+ctx.fillStyle = "rgba(0, 0, 0, 0.65)";
+ctx.fillRect(40, 25, 720, 85);
+ctx.fillStyle = "#ffffff";
+ctx.font = "bold 22px sans-serif";
+ctx.textAlign = "center";
+ctx.textBaseline = "middle";
+ctx.fillText(natalMsg, 400, 67);
+// 4. Rodapé Vermelho Festivo com @ e # informados
+ctx.fillStyle = "rgba(211, 47, 47, 0.95)";
+ctx.fillRect(0, 535, 800, 65);
+ctx.fillStyle = "#ffffff";
+ctx.font = "bold 20px sans-serif";
+ctx.fillText(${natalAt}   ${natalHash}, 400, 568);
+// Troca de telas
+screenCamera.classList.add('hidden');
+screenResult.classList.remove('hidden');
+if(stream) stream.getTracks().forEach(track => track.stop());
+document.getElementById('shareInstructions').innerHTML = <b>Passo 1:</b> Toque e segure na imagem acima para salvá-la.<br> <b>Passo 2:</b> Poste no seu story ou feed do Instagram marcando o dono da festa: <b>${natalAt}</b> e usando a hashtag <b>${natalHash}</b>!;
+};
+});
+document.getElementById('btnReset').addEventListener('click', () => {
+screenResult.classList.add('hidden');
+document.getElementById('btnStart').click();
+});
+// Intent Link para o Instagram
+document.getElementById('btnShare').addEventListener('click', () => {
+window.location.href = "instagram://camera";
+setTimeout(() => {
+window.location.href = "https://instagram.com";
+}, 1200);
+});
+// --- SISTEMA DE LOGIN E ADMINISTRAÇÃO DINÂMICA ---
+const modalLogin = document.getElementById('modalLogin');
+const modalConfig = document.getElementById('modalConfig');
+document.getElementById('adminTrigger').addEventListener('click', () => modalLogin.classList.remove('hidden'));
+document.getElementById('btnLoginClose').addEventListener('click', () => modalLogin.classList.add('hidden'));
+document.getElementById('btnConfigClose').addEventListener('click', () => modalConfig.classList.add('hidden'));
+document.getElementById('btnLoginSubmit').addEventListener('click', () => {
+const user = document.getElementById('adminUser').value;
+const pass = document.getElementById('adminPass').value;
+if (user === CRED_USER && pass === CRED_PASS) {
+modalLogin.classList.add('hidden');
+modalConfig.classList.remove('hidden');
+// Exibe os parâmetros atuais nos campos
+document.getElementById('configMsg').value = natalMsg;
+document.getElementById('configHash').value = natalHash;
+document.getElementById('configAt').value = natalAt;
+document.getElementById('configPhotoUrl').value = natalPhoto;
+} else {
+alert("Credenciais incorretas. Acesso negado.");
+}
+});
+// Gerador Dinâmico de Link Seguro
+document.getElementById('btnGenerateLink').addEventListener('click', () => {
+const m = encodeURIComponent(document.getElementById('configMsg').value);
+const h = encodeURIComponent(document.getElementById('configHash').value);
+const a = encodeURIComponent(document.getElementById('configAt').value);
+const p = encodeURIComponent(document.getElementById('configPhotoUrl').value);
+// Monta a URL parametrizada baseada no link de acesso atual
+const baseUrl = window.location.href.split('?')[0];
+const finalUrl = ${baseUrl}?msg=${m}&hash=${h}&at=${a}&photo=${p};
+document.getElementById('generatedUrlText').innerText = finalUrl;
+document.getElementById('urlOutputContainer').classList.remove('hidden');
+});
