@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -139,15 +138,17 @@ p { line-height: 1.5; }
 
 /* IMAGEM DO PRESENTE NA TELA DA CÂMERA */
 .gift-icon {
-  width: 46%;
-  max-width: 150px;
-  aspect-ratio: 1;
-  border-radius: 22px;
-  background: #ffffffe0;
-  display: grid;
-  place-items: center;
-  box-shadow: 0 6px 20px #0003;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  aspect-ratio: auto;
+  border-radius: 0;
+  background: transparent;
+  display: block;
   overflow: hidden;
+  box-shadow: none;
 }
 
 .gift-icon img {
@@ -155,7 +156,7 @@ p { line-height: 1.5; }
   width: 100%;
   height: 100%;
   object-fit: contain;
-  padding: 10px;
+  padding: 0;
 }
 
 .camera-hint { margin: 10px 0; font-weight: 700; }
